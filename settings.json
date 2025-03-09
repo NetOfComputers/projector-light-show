@@ -1,0 +1,33 @@
+{
+    "color-strobe": {
+        "enabled": true,
+        "factor": 0.5,
+        "colors": [
+            "red",
+            "green",
+            "blue",
+            "yellow",
+            "purple",
+            "cyan",
+            "white"
+        ]
+    },
+    "web-type": {
+        "enabled": true,
+        "html-file": "./fx/web/index.html"
+    },
+    "gif-image": {
+        "enabled": true,
+        "gif-file": "./fx/gif/animated.gif"
+    },
+    "override-position": false,
+    "position": {
+        "x": 0,
+        "y": 0
+    },
+    "override-size": false,
+    "size": {
+        "width": 1920,
+        "height": 1080
+    }
+}

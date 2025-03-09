@@ -3,11 +3,15 @@ import threading
 import time
 from beat_detection import AudioProcessor  # Import AudioProcessor class
 import screeninfo  # This will be used to get screen dimensions
-from light_show_fx import LSFX
+import json
 class LightShowApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Light Show")
+
+        # Load the settings
+        with open('settings.json') as f:
+            self.fx = json.load(f)
 
         # Get the second screen's resolution and position
         screens = screeninfo.get_monitors()
@@ -18,6 +22,14 @@ class LightShowApp:
             screen_x = screen.x
             screen_y = screen.y
 
+            if self.fx['override-size']:
+                screen_width = self.fx['size']['width']
+                screen_height = self.fx['size']['height']
+
+            if self.fx['override-position']:
+                screen_x = self.fx['position']['x']
+                screen_y = self.fx['position']['y']
+                
             # Set the window size to the screen's dimensions (fullscreen)
             self.root.geometry(f"{screen_width}x{screen_height}+{screen_x}+{screen_y}")
         else:
@@ -36,15 +48,11 @@ class LightShowApp:
         self.last_update_time = time.time()  # Track when the last update occurred
         self.update_interval = 60 / self.bpm if self.bpm else 1  # Default to 1 second interval if no BPM
 
-        # Prepare fx instance
-
-        self.fx = LSFX(self.root)
-
-
         self.color_index = 0  # Start with the first color in the list
-        self.colors = ['#FF5733', '#33FF57', '#3357FF', '#F1C40F', '#9B59B6', '#E74C3C']  # List of colors
+        self.colors =  self.fx['color-strobe']['colors'] # List of colors
         self.color_switching = False  # Flag to control color switching
-        self.color_switching = False  # Flag to control color switching
+        self.update_interval = 1
+    
         # Create an instance of AudioProcessor and pass the update method as a callback
         self.audio_processor = AudioProcessor(self.update_light_show)
 
@@ -54,9 +62,14 @@ class LightShowApp:
 
         # Start the tkinter main loop
         self.update_canvas_color()
+        
 
     
-
+    def get_update_interval(self):
+        '''Returns the interval multiplied by the factor of this effect to increment proportionally the speed'''
+        current_update_interval = round(self.update_interval * float(self.fx.get('color-strobe', {}).get('factor', 1)))
+        print(f'self.update_interval: {self.update_interval}, self.fx["color-strobe"]["factor"]: {self.fx["color-strobe"]["factor"]}, current_update_interval: {current_update_interval}')
+        return current_update_interval
 
     '''The function to calculate bpm calls this method passing in to it the current bpm'''
     def update_light_show(self, bpm):
@@ -70,7 +83,7 @@ class LightShowApp:
     def update_canvas_color(self):
         if self.color_switching and self.bpm > 0:
             current_time = time.time()
-            if current_time - self.last_update_time >= self.update_interval:
+            if current_time - self.last_update_time >= self.get_update_interval():
                 self.last_update_time = current_time
 
                 print('Applying effect...')
@@ -85,9 +98,8 @@ class LightShowApp:
                 print('Effect applied.', self.colors[self.color_index])
         
         # update when the time of the effect is elapsed
-        print('updating after', self.update_interval, 'seconds')
-        self.root.after(int(self.update_interval * 1000), self.update_canvas_color)
-
+        interval_ms = round(self.get_update_interval() * 1000)  # Round the milliseconds
+        self.root.after(interval_ms, self.update_canvas_color)
 
 
 def main():

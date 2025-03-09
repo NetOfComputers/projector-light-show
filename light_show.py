@@ -2,17 +2,36 @@ import tkinter as tk
 import threading
 import time
 from beat_detection import AudioProcessor  # Import AudioProcessor class
+import screeninfo  # This will be used to get screen dimensions
 
 class LightShowApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Light Show")
-        self.root.geometry("1920x1080+1920+0")  # Set window size and position
-        # self.root.attributes('-fullscreen', True)
-        # self.root.geometry("400x400+1911+0")  # Set window size and position
-        # self.root.overrideredirect(True)  # Remove window decorations
-        self.canvas = tk.Canvas(root, width=400, height=400)
-        self.canvas.pack()
+
+        # Get the second screen's resolution and position
+        screens = screeninfo.get_monitors()
+        if len(screens) > 1:
+            screen = screens[1]  # Assuming second monitor is at index 1
+            screen_width = screen.width
+            screen_height = screen.height
+            screen_x = screen.x
+            screen_y = screen.y
+
+            # Set the window size to the screen's dimensions (fullscreen)
+            self.root.geometry(f"{screen_width}x{screen_height}+{screen_x}+{screen_y}")
+        else:
+            print("Second screen not found. Defaulting to primary screen.")
+            self.root.geometry("1920x1080+0+0")  # Default to primary screen
+
+        # Now remove window decorations (no borders or title bar)
+        self.root.overrideredirect(True)
+
+        # Set up the canvas and other GUI elements
+        self.canvas = tk.Canvas(root, width=screen_width, height=screen_height)
+        self.canvas.pack(fill=tk.BOTH, expand=True)
+        
+        # Initial variables for BPM and color switching
         self.bpm = 0  # Initial BPM value
         self.last_update_time = time.time()  # Track when the last update occurred
         self.update_interval = 60 / self.bpm if self.bpm else 1  # Default to 1 second interval if no BPM

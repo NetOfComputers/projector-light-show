@@ -38,13 +38,13 @@ class LightShowApp:
 
         # Prepare fx instance
 
-        self.fx = LSFX()
+        self.fx = LSFX(self.root)
 
 
-        # # # self.color_index = 0  # Start with the first color in the list
-        # # # self.colors = ['#FF5733', '#33FF57', '#3357FF', '#F1C40F', '#9B59B6', '#E74C3C']  # List of colors
-        # # # self.color_switching = False  # Flag to control color switching
-
+        self.color_index = 0  # Start with the first color in the list
+        self.colors = ['#FF5733', '#33FF57', '#3357FF', '#F1C40F', '#9B59B6', '#E74C3C']  # List of colors
+        self.color_switching = False  # Flag to control color switching
+        self.color_switching = False  # Flag to control color switching
         # Create an instance of AudioProcessor and pass the update method as a callback
         self.audio_processor = AudioProcessor(self.update_light_show)
 
@@ -72,14 +72,23 @@ class LightShowApp:
             current_time = time.time()
             if current_time - self.last_update_time >= self.update_interval:
                 self.last_update_time = current_time
+
+                print('Applying effect...')
+                # fx.apply_current()
                 
                 # call current effect
-                # # Update the color index to cycle through the colors list
-                # self.color_index = (self.color_index + 1) % len(self.colors)  # Cycle through colors
-                # color = self.colors[self.color_index]  # Get the current color from the list
-                # self.canvas.config(bg=color)
+                # Update the color index to cycle through the colors list
+                self.color_index = (self.color_index + 1) % len(self.colors)  # Cycle through colors
+                color = self.colors[self.color_index]  # Get the current color from the list
+                self.canvas.config(bg=color)
+
+                print('Effect applied.', self.colors[self.color_index])
         
-        # self.root.after(10, self.update_canvas_color)  # Continue checking every 10ms for faster updates
+        # update when the time of the effect is elapsed
+        print('updating after', self.update_interval, 'seconds')
+        self.root.after(int(self.update_interval * 1000), self.update_canvas_color)
+
+
 
 def main():
     root = tk.Tk()

@@ -1,0 +1,22 @@
+{
+    "color-strobe": {
+        "enabled": true,
+        "colors": [
+            "red",
+            "green",
+            "blue",
+            "yellow",
+            "purple",
+            "cyan",
+            "white"
+        ]
+    },
+    "web-type": {
+        "enabled": true,
+        "html-file": "./fx/web/index.html"
+    },
+    "gif-image": {
+        "enabled": true,
+        "gif-file": "./fx/gif/animated.gif"
+    }
+}

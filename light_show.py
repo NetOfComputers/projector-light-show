@@ -3,7 +3,7 @@ import threading
 import time
 from beat_detection import AudioProcessor  # Import AudioProcessor class
 import screeninfo  # This will be used to get screen dimensions
-
+from light_show_fx import LSFX
 class LightShowApp:
     def __init__(self, root):
         self.root = root
@@ -35,9 +35,15 @@ class LightShowApp:
         self.bpm = 0  # Initial BPM value
         self.last_update_time = time.time()  # Track when the last update occurred
         self.update_interval = 60 / self.bpm if self.bpm else 1  # Default to 1 second interval if no BPM
-        self.color_index = 0  # Start with the first color in the list
-        self.colors = ['#FF5733', '#33FF57', '#3357FF', '#F1C40F', '#9B59B6', '#E74C3C']  # List of colors
-        self.color_switching = False  # Flag to control color switching
+
+        # Prepare fx instance
+
+        self.fx = LSFX()
+
+
+        # # # self.color_index = 0  # Start with the first color in the list
+        # # # self.colors = ['#FF5733', '#33FF57', '#3357FF', '#F1C40F', '#9B59B6', '#E74C3C']  # List of colors
+        # # # self.color_switching = False  # Flag to control color switching
 
         # Create an instance of AudioProcessor and pass the update method as a callback
         self.audio_processor = AudioProcessor(self.update_light_show)
@@ -49,24 +55,31 @@ class LightShowApp:
         # Start the tkinter main loop
         self.update_canvas_color()
 
+    
+
+
+    '''The function to calculate bpm calls this method passing in to it the current bpm'''
     def update_light_show(self, bpm):
         print('BPM updated:', bpm)
-        self.bpm = bpm  # Update the BPM value
-        self.update_interval = 60 / self.bpm if self.bpm else 1  # Calculate the new update interval
-        self.color_switching = True  # Start switching the color once we get the first BPM
+        self.bpm = bpm
+        self.update_interval = 60 / self.bpm if self.bpm else 1
+        self.color_switching = True
 
+    '''This function calls a effect function every n seconds based on interval time. That interval time
+    is calculated based on the BPM value. If the BPM is 0, it defaults to 1 second interval.'''
     def update_canvas_color(self):
         if self.color_switching and self.bpm > 0:
             current_time = time.time()
             if current_time - self.last_update_time >= self.update_interval:
-                self.last_update_time = current_time  # Update the last update time
+                self.last_update_time = current_time
                 
-                # Update the color index to cycle through the colors list
-                self.color_index = (self.color_index + 1) % len(self.colors)  # Cycle through colors
-                color = self.colors[self.color_index]  # Get the current color from the list
-                self.canvas.config(bg=color)
+                # call current effect
+                # # Update the color index to cycle through the colors list
+                # self.color_index = (self.color_index + 1) % len(self.colors)  # Cycle through colors
+                # color = self.colors[self.color_index]  # Get the current color from the list
+                # self.canvas.config(bg=color)
         
-        self.root.after(10, self.update_canvas_color)  # Continue checking every 10ms for faster updates
+        # self.root.after(10, self.update_canvas_color)  # Continue checking every 10ms for faster updates
 
 def main():
     root = tk.Tk()
